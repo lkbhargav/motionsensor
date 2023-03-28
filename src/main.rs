@@ -2,7 +2,8 @@ use pir_motion_sensor::sensor::motion::MotionSensor;
 use rascam::*;
 use std::{
     sync::mpsc::{self, sync_channel, Receiver, SyncSender},
-    time::SystemTime,
+    thread,
+    time::{Duration, SystemTime},
 };
 use tokio::task;
 
@@ -42,8 +43,6 @@ async fn main() {
     }
     info!("{}", info);
 
-    simple_sync(&info.cameras[0]);
-
     loop {
         if let Ok(detection_msg) = detections_channel_receiver.try_recv() {
             // detection received
@@ -56,6 +55,9 @@ async fn main() {
             println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
 
             // TODO: trigger camera to take picture
+            simple_sync(&info.cameras[0]);
+
+            thread::sleep(time::Duration::from_secs(1));
         }
     }
 }
