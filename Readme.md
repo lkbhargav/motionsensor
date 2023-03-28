@@ -1,0 +1,1 @@
+Raspberry pi 2 pinouts: https://www.raspberry-pi-geek.com/howto/GPIO-Pinout-Rasp-Pi-1-Model-B-Rasp-Pi-2-Model-B
