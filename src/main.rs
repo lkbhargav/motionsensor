@@ -35,14 +35,6 @@ async fn main() {
     // starting detector in the background
     task::spawn_blocking(move || sensor_bedroom.start_detector(receiver));
 
-    let info = info().unwrap();
-    if info.cameras.len() < 1 {
-        error!("Found 0 cameras. Exiting");
-        // note that this doesn't run destructors
-        ::std::process::exit(1);
-    }
-    info!("{}", info);
-
     loop {
         if let Ok(detection_msg) = detections_channel_receiver.try_recv() {
             // detection received
@@ -55,22 +47,8 @@ async fn main() {
             println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
 
             // TODO: trigger camera to take picture
-            simple_sync(&info.cameras[0]);
 
             thread::sleep(time::Duration::from_secs(1));
         }
     }
-}
-
-fn simple_sync(info: &CameraInfo) {
-    let mut camera = SimpleCamera::new(info.clone()).unwrap();
-    camera.activate().unwrap();
-
-    let sleep_duration = time::Duration::from_millis(2000);
-    thread::sleep(sleep_duration);
-
-    let b = camera.take_one().unwrap();
-    File::create("image.jpg").unwrap().write_all(&b).unwrap();
-
-    info!("Saved image as image.jpg");
 }
