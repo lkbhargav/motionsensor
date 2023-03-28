@@ -1,4 +1,5 @@
 use pir_motion_sensor::sensor::motion::MotionSensor;
+use rascam::*;
 use std::{
     sync::mpsc::{self, sync_channel, Receiver, SyncSender},
     time::SystemTime,
@@ -33,15 +34,41 @@ async fn main() {
     // starting detector in the background
     task::spawn_blocking(move || sensor_bedroom.start_detector(receiver));
 
+    let info = info().unwrap();
+    if info.cameras.len() < 1 {
+        error!("Found 0 cameras. Exiting");
+        // note that this doesn't run destructors
+        ::std::process::exit(1);
+    }
+    info!("{}", info);
+
+    simple_sync(&info.cameras[0]);
+
     loop {
         if let Ok(detection_msg) = detections_channel_receiver.try_recv() {
             // detection received
             // each "valid" detection constains sensor name and time of detection as SystemTime()
             let (detection_name, detection_time) = detection_msg;
 
-            println!("detection happened, sensor: {detection_name}, time: {detection_time:?} ");
+            let datetime: DateTime<Utc> = detection_time.into();
+            let datetime = format!("{}", datetime.format("%m/%d/%Y %T"));
+
+            println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
 
             // TODO: trigger camera to take picture
         }
     }
+}
+
+fn simple_sync(info: &CameraInfo) {
+    let mut camera = SimpleCamera::new(info.clone()).unwrap();
+    camera.activate().unwrap();
+
+    let sleep_duration = time::Duration::from_millis(2000);
+    thread::sleep(sleep_duration);
+
+    let b = camera.take_one().unwrap();
+    File::create("image.jpg").unwrap().write_all(&b).unwrap();
+
+    info!("Saved image as image.jpg");
 }
