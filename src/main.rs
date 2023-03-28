@@ -1,10 +1,12 @@
 use pir_motion_sensor::sensor::motion::MotionSensor;
-use rascam::*;
 use std::{
     sync::mpsc::{self, sync_channel, Receiver, SyncSender},
     thread,
     time::{Duration, SystemTime},
 };
+use chrono::offset::Utc;
+use chrono::DateTime;
+use std::time::{self, Duration};
 use tokio::task;
 
 const GPIO_PIR: u8 = 21;
@@ -33,7 +35,7 @@ async fn main() {
     let (_stop_command, receiver) = mpsc::channel();
 
     // starting detector in the background
-    task::spawn_blocking(move || sensor_bedroom.start_detector(receiver));
+    task::spawn_blocking(move || sensor_bedroom.start_detector(receiver));`
 
     loop {
         if let Ok(detection_msg) = detections_channel_receiver.try_recv() {
