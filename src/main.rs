@@ -4,6 +4,7 @@ use email::{Email, Relay};
 use motionsensor::db::DB;
 use motionsensor::environment::EnvironmentVariables;
 use motionsensor::pir::PIR;
+use std::time::SystemTime;
 use std::{fs, process::Command};
 
 const GPIO_PIR: u8 = 21;
@@ -27,9 +28,7 @@ async fn main() {
     let mut last_image_capture_time = SystemTime::now();
 
     loop {
-        println!("At the top!");
         if let Ok(detection_msg) = pir.receive() {
-            println!("Detected!");
             let (detection_name, detection_time) = detection_msg;
 
             // only consider it as a valid motion if detected_time is greater than last_image_capture_time
@@ -87,8 +86,6 @@ async fn main() {
             }
 
             last_image_capture_time = SystemTime::now();
-
-            println!("Completed!");
         }
     }
 }
