@@ -19,6 +19,8 @@ async fn main() {
     // Initialize image settings with their default values.
     let image_settings = ImageSettings::default();
 
+    camera_operations::click_image(camera_settings.clone(), image_settings.clone());
+
     loop {
         if let Ok(detection_msg) = pir.receive() {
             let (detection_name, detection_time) = detection_msg;
