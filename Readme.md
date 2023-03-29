@@ -18,3 +18,5 @@ Deployment steps:
 3. Build the project and move the binary to `/usr/local/bin/`
 4. Update the environment variables if necessary from the Supervisor config
 5. Run `reread` and `update` commands on the supervisorctl
+
+**Note**: Raspberry pi should have both `sqlite3` and `libsqlite3-dev` packages installed or there will be compilation errors
