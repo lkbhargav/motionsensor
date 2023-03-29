@@ -60,14 +60,14 @@ async fn main() {
             }
 
             if vars.email_alert {
-                let mut message = "Motion detected in the room!";
+                let mut message = format!(
+                    "Motion detected and {} images are being collected to {}",
+                    vars.number_of_images_to_capture, prefix
+                )
+                .as_str();
 
-                if vars.capture_image {
-                    message = format!(
-                        "Motion detected and {} images are being collected to {}",
-                        vars.number_of_images_to_capture, prefix
-                    )
-                    .as_str();
+                if !vars.capture_image {
+                    message = "Motion detected in the room!";
                 }
 
                 let res = gmail.send(TO_ADDRESS, "Motion detected", message);
