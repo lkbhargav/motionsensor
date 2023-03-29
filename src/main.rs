@@ -36,7 +36,7 @@ async fn main() {
 
             for i in 0..30 {
                 camera_settings.output = &format!("{prefix}/{detection_name}-{i}.jpg");
-                camera_operations::click_image(camera_settings, image_settings);
+                camera_operations::click_image(camera_settings.clone(), image_settings.clone());
             }
         }
     }

@@ -9,5 +9,5 @@ edition = "2021"
 anyhow = "1.0.70"
 chrono = "0.4.24"
 pir-motion-sensor = "0.1.2"
-raspicam = "0.1.0"
+raspicam = {git = "https://github.com/lkbhargav/raspicam.git"}
 tokio = { version = "1.27.0", features = ["full"] }
