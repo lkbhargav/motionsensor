@@ -29,7 +29,7 @@ async fn main() {
             println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
 
             let datetime = datetime.replace(" ", "");
-            let prefix = format!("~/{datetime}");
+            let prefix = format!("/home/pi/{datetime}");
 
             fs::create_dir(prefix.clone()).expect("trying to create a directory");
 
