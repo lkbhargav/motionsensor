@@ -1,7 +1,4 @@
-use chrono::offset::Utc;
-use chrono::DateTime;
 use motionsensor::pir::PIR;
-use pir_motion_sensor::sensor::motion::MotionSensor;
 use std::{
     sync::mpsc::{self, sync_channel, Receiver, SyncSender},
     thread,
