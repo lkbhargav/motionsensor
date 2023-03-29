@@ -28,8 +28,7 @@ async fn main() {
 
             println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
 
-            let datetime = datetime.replace(" ", "");
-            let datetime = datetime.replace(":", "");
+            let datetime = datetime.replace(" ", "").replace(":", "").replace("/", "");
             let prefix = format!("/var/log/images/{datetime}");
             println!("Directory name: {prefix}");
             fs::create_dir(prefix.clone()).expect("trying to create a directory");
