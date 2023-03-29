@@ -21,32 +21,32 @@ async fn main() {
 
     camera_operations::click_image(camera_settings.clone(), image_settings.clone());
 
-    loop {
-        if let Ok(detection_msg) = pir.receive() {
-            let (detection_name, detection_time) = detection_msg;
+    // loop {
+    //     if let Ok(detection_msg) = pir.receive() {
+    //         let (detection_name, detection_time) = detection_msg;
 
-            let datetime: DateTime<Utc> = detection_time.into();
-            let datetime = format!("{}", datetime.format("%m/%d/%Y %T"));
+    //         let datetime: DateTime<Utc> = detection_time.into();
+    //         let datetime = format!("{}", datetime.format("%m/%d/%Y %T"));
 
-            println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
+    //         println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
 
-            let datetime = datetime.replace(" ", "").replace(":", "").replace("/", "");
-            let prefix = format!("/var/log/images/{datetime}");
+    //         let datetime = datetime.replace(" ", "").replace(":", "").replace("/", "");
+    //         let prefix = format!("/var/log/images/{datetime}");
 
-            fs::create_dir(prefix.clone()).expect("trying to create a directory");
+    //         fs::create_dir(prefix.clone()).expect("trying to create a directory");
 
-            for i in 0..30 {
-                println!("In here");
-                camera_settings.set_output(format!("{prefix}/{detection_name}-{i}.jpg"));
+    //         for i in 0..30 {
+    //             println!("In here");
+    //             camera_settings.set_output(format!("{prefix}/{detection_name}-{i}.jpg"));
 
-                match camera_operations::click_image(
-                    camera_settings.clone(),
-                    image_settings.clone(),
-                ) {
-                    Ok(_r) => continue,
-                    Err(e) => println!("error trying to capture image: {e}"),
-                }
-            }
-        }
-    }
+    //             match camera_operations::click_image(
+    //                 camera_settings.clone(),
+    //                 image_settings.clone(),
+    //             ) {
+    //                 Ok(_r) => continue,
+    //                 Err(e) => println!("error trying to capture image: {e}"),
+    //             }
+    //         }
+    //     }
+    // }
 }
