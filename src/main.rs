@@ -25,7 +25,9 @@ async fn main() {
     .expect("error initializing email service");
 
     loop {
+        println!("At the top!");
         if let Ok(detection_msg) = pir.receive() {
+            println!("Detected!");
             let (detection_name, detection_time) = detection_msg;
 
             let datetime: DateTime<Utc> = detection_time.into();
@@ -76,6 +78,8 @@ async fn main() {
                     Err(e) => println!("error trying to capture image: {e}"),
                 }
             }
+
+            println!("Completed!");
         }
     }
 }
