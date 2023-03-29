@@ -35,7 +35,14 @@ async fn main() {
 
             for i in 0..30 {
                 camera_settings.set_output(format!("{prefix}/{detection_name}-{i}.jpg"));
-                camera_operations::click_image(camera_settings.clone(), image_settings.clone());
+
+                match camera_operations::click_image(
+                    camera_settings.clone(),
+                    image_settings.clone(),
+                ) {
+                    Ok(r) => continue,
+                    Err(e) => println!("error trying to capture image: {e}"),
+                }
             }
         }
     }
