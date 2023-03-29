@@ -15,6 +15,7 @@ pub struct EnvironmentVariables {
     pub images_path: String,
     pub number_of_images_to_capture: u16,
     pub app_name: String,
+    pub capture_image: bool,
 }
 
 macro_rules! parse_env {
@@ -40,6 +41,11 @@ impl EnvironmentVariables {
         );
         let number_of_images_to_capture = number_of_images_to_capture.parse::<u16>()?;
         let app_name = parse_env!("MS_APP_NAME", "MS_APP_NAME is required but not found");
+        let capture_image = parse_env!(
+            "MS_CAPTURE_IMAGE",
+            "MS_CAPTURE_IMAGE is required but not found"
+        );
+        let capture_image = capture_image.parse::<bool>()?;
 
         Ok(EnvironmentVariables {
             gmail: Gmail { username, password },
@@ -48,6 +54,7 @@ impl EnvironmentVariables {
             images_path,
             number_of_images_to_capture,
             app_name,
+            capture_image,
         })
     }
 }

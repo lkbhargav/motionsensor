@@ -4,7 +4,8 @@ use email::{Email, Relay};
 use motionsensor::db::DB;
 use motionsensor::environment::EnvironmentVariables;
 use motionsensor::pir::PIR;
-use std::time::SystemTime;
+use std::thread;
+use std::time::{Duration, SystemTime};
 use std::{fs, process::Command};
 
 const GPIO_PIR: u8 = 21;
@@ -36,17 +37,21 @@ async fn main() {
                 continue;
             }
 
-            let datetime: DateTime<Utc> = detection_time.into();
-            let datetime = format!("{}", datetime.format("%m/%d/%Y %T"));
+            let mut prefix = String::new();
 
-            let datetime_instance_folder = datetime
-                .replace(" ", "T")
-                .replace(":", "-")
-                .replace("/", "-");
+            if vars.capture_image {
+                let datetime: DateTime<Utc> = detection_time.into();
+                let datetime = format!("{}", datetime.format("%m/%d/%Y %T"));
 
-            let prefix = format!("{}/{datetime_instance_folder}", vars.images_path);
+                let datetime_instance_folder = datetime
+                    .replace(" ", "T")
+                    .replace(":", "-")
+                    .replace("/", "-");
 
-            fs::create_dir(prefix.clone()).expect("trying to create a directory");
+                prefix = format!("{}/{datetime_instance_folder}", vars.images_path);
+
+                fs::create_dir(prefix.clone()).expect("trying to create a directory");
+            }
 
             let res = db.log(&prefix);
 
@@ -55,34 +60,40 @@ async fn main() {
             }
 
             if vars.email_alert {
-                let res = gmail.send(
-                    TO_ADDRESS,
-                    "Motion detected",
-                    format!(
+                let mut message = "Motion detected in the room!";
+
+                if vars.capture_image {
+                    message = format!(
                         "Motion detected and {} images are being collected to {}",
                         vars.number_of_images_to_capture, prefix
                     )
-                    .as_str(),
-                );
+                    .as_str();
+                }
+
+                let res = gmail.send(TO_ADDRESS, "Motion detected", message);
 
                 if res.is_err() {
                     println!("error sending email: {}", res.err().unwrap());
                 }
             }
 
-            for i in 0..vars.number_of_images_to_capture {
-                let file_name = format!("{prefix}/{detection_name}-{i}.jpg");
+            if vars.capture_image {
+                for i in 0..vars.number_of_images_to_capture {
+                    let file_name = format!("{prefix}/{detection_name}-{i}.jpg");
 
-                match Command::new("/usr/bin/raspistill")
-                    .arg("-rot")
-                    .arg("180")
-                    .arg("-o")
-                    .arg(&file_name)
-                    .output()
-                {
-                    Ok(_r) => continue,
-                    Err(e) => println!("error trying to capture image: {e}"),
+                    match Command::new("/usr/bin/raspistill")
+                        .arg("-rot")
+                        .arg("180")
+                        .arg("-o")
+                        .arg(&file_name)
+                        .output()
+                    {
+                        Ok(_r) => continue,
+                        Err(e) => println!("error trying to capture image: {e}"),
+                    }
                 }
+            } else {
+                thread::sleep(Duration::from_secs(5));
             }
 
             last_image_capture_time = SystemTime::now();
