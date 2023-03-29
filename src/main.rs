@@ -1,14 +1,28 @@
 use chrono::offset::Utc;
 use chrono::DateTime;
+use email::{Email, Relay};
+use motionsensor::db::DB;
+use motionsensor::environment::EnvironmentVariables;
 use motionsensor::pir::PIR;
 use std::{fs, process::Command};
 
 const GPIO_PIR: u8 = 21;
+const EMAIL_FROM: &str = "DoorSensor <bhargav.lakkur@gmail.com>";
+const TO_ADDRESS: &str = "Bhargav Lakkur <lkbhargav9@gmail.com>";
 
 #[tokio::main]
 async fn main() {
-    let pir = PIR::new("BedroomSensor", GPIO_PIR);
-    let directory_to_hold_images = "/var/log/images";
+    let vars = EnvironmentVariables::init().expect("error initializing env vars");
+    let mut db = DB::init(&vars.db_path).expect("error initializing DB instance");
+    let pir = PIR::new(&vars.app_name, GPIO_PIR);
+    let gmail = Email::new(
+        EMAIL_FROM,
+        EMAIL_FROM,
+        &vars.gmail.username,
+        &vars.gmail.password,
+        Relay::Gmail,
+    )
+    .expect("error initializing email service");
 
     loop {
         if let Ok(detection_msg) = pir.receive() {
@@ -17,14 +31,34 @@ async fn main() {
             let datetime: DateTime<Utc> = detection_time.into();
             let datetime = format!("{}", datetime.format("%m/%d/%Y %T"));
 
-            println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
+            let datetime_instance_folder = datetime
+                .replace(" ", "T")
+                .replace(":", "-")
+                .replace("/", "-");
 
-            let datetime = datetime.replace(" ", "").replace(":", "").replace("/", "");
-            let prefix = format!("{directory_to_hold_images}/{datetime}");
+            let prefix = format!("{}/{datetime_instance_folder}", vars.images_path);
 
             fs::create_dir(prefix.clone()).expect("trying to create a directory");
 
-            for i in 0..30 {
+            let res = db.log(&prefix);
+
+            if res.is_err() {
+                println!("error trying to log a record in DB");
+            }
+
+            if vars.email_alert {
+                gmail.send(
+                    TO_ADDRESS,
+                    "Motion detected",
+                    format!(
+                        "Motion detected and {} images are being collected to {}",
+                        vars.number_of_images_to_capture, prefix
+                    )
+                    .as_str(),
+                )
+            }
+
+            for i in 0..vars.number_of_images_to_capture {
                 let file_name = format!("{prefix}/{detection_name}-{i}.jpg");
 
                 match Command::new("/usr/bin/raspistill")
