@@ -19,7 +19,14 @@ async fn main() {
     // Initialize image settings with their default values.
     let image_settings = ImageSettings::default();
 
-    Command::new("/usr/bin/raspistill -o ~/abcd.jpg").output();
+    println!("1");
+
+    match Command::new("/usr/bin/raspistill -o ~/abcd.jpg").output() {
+        Ok(_r) => println!("Ok"),
+        Err(e) => println!("error trying to capture image: {e}"),
+    }
+
+    println!("2");
 
     // loop {
     //     if let Ok(detection_msg) = pir.receive() {
