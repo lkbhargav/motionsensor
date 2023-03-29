@@ -1,6 +1,7 @@
 use chrono::offset::Utc;
 use chrono::DateTime;
 use motionsensor::pir::PIR;
+use raspicam::image::{camera_operations, CameraSettings, ImageSettings};
 use std::{thread, time::Duration};
 
 const GPIO_PIR: u8 = 21;
@@ -48,7 +49,16 @@ async fn main() {
 
             println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
 
+            // Initialize camera settings with their default values.
+            let camera_settings = CameraSettings::default();
+
+            camera_settings.output = "./test.jpg";
+
+            // Initialize image settings with their default values.
+            let image_settings = ImageSettings::default();
+
             // TODO: trigger camera to take picture
+            camera_operations::click_image(camera_settings, image_settings);
 
             thread::sleep(Duration::from_secs(1));
         }
