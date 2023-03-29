@@ -24,11 +24,18 @@ async fn main() {
     )
     .expect("error initializing email service");
 
+    let mut last_image_capture_time = SystemTime::now();
+
     loop {
         println!("At the top!");
         if let Ok(detection_msg) = pir.receive() {
             println!("Detected!");
             let (detection_name, detection_time) = detection_msg;
+
+            // only consider it as a valid motion if detected_time is greater than last_image_capture_time
+            if detection_time <= last_image_capture_time {
+                continue;
+            }
 
             let datetime: DateTime<Utc> = detection_time.into();
             let datetime = format!("{}", datetime.format("%m/%d/%Y %T"));
@@ -78,6 +85,8 @@ async fn main() {
                     Err(e) => println!("error trying to capture image: {e}"),
                 }
             }
+
+            last_image_capture_time = SystemTime::now();
 
             println!("Completed!");
         }
