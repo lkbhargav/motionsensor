@@ -1,7 +1,6 @@
 use chrono::offset::Utc;
 use chrono::DateTime;
 use motionsensor::pir::PIR;
-use raspicam::image::camera_operations;
 use raspicam::image::{
     camera_operations,
     settings::{CameraSettings, ImageSettings},
@@ -36,7 +35,7 @@ async fn main() {
             fs::create_dir(prefix).expect("trying to create a directory");
 
             for i in 0..30 {
-                camera_settings.output = format!("{prefix}/{detection_name}-{i}.jpg");
+                camera_settings.output = &format!("{prefix}/{detection_name}-{i}.jpg");
                 camera_operations::click_image(camera_settings, image_settings);
             }
         }
