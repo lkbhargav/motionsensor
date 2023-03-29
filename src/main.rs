@@ -30,10 +30,11 @@ async fn main() {
 
             let datetime = datetime.replace(" ", "").replace(":", "").replace("/", "");
             let prefix = format!("/var/log/images/{datetime}");
-            println!("Directory name: {prefix}");
+
             fs::create_dir(prefix.clone()).expect("trying to create a directory");
 
             for i in 0..30 {
+                println!("In here");
                 camera_settings.set_output(format!("{prefix}/{detection_name}-{i}.jpg"));
 
                 match camera_operations::click_image(
