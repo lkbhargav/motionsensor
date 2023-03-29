@@ -38,6 +38,7 @@ impl EnvironmentVariables {
             "MS_NUMBER_OF_IMAGES_TO_CAPTURE",
             "MS_NUMBER_OF_IMAGES_TO_CAPTURE is required but not found"
         );
+        let number_of_images_to_capture = number_of_images_to_capture.parse::<u16>()?;
         let app_name = parse_env!("MS_APP_NAME", "MS_APP_NAME is required but not found");
 
         Ok(EnvironmentVariables {
