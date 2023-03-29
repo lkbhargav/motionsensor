@@ -5,7 +5,7 @@ use raspicam::image::{
     camera_operations,
     settings::{CameraSettings, ImageSettings},
 };
-use std::fs;
+use std::{fs, process::Command};
 
 const GPIO_PIR: u8 = 21;
 
@@ -19,7 +19,7 @@ async fn main() {
     // Initialize image settings with their default values.
     let image_settings = ImageSettings::default();
 
-    camera_operations::click_image(camera_settings, image_settings);
+    Command::new("/usr/bin/raspistill -o ~/abcd.jpg").output();
 
     // loop {
     //     if let Ok(detection_msg) = pir.receive() {
