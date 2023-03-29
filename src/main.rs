@@ -8,7 +8,7 @@ use std::time::SystemTime;
 use std::{fs, process::Command};
 
 const GPIO_PIR: u8 = 21;
-const EMAIL_FROM: &str = "DoorSensor <bhargav.lakkur@gmail.com>";
+const EMAIL_FROM: &str = "MotionSensor <bhargav.lakkur@gmail.com>";
 const TO_ADDRESS: &str = "Bhargav Lakkur <lkbhargav9@gmail.com>";
 
 #[tokio::main]
