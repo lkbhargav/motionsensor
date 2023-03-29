@@ -21,7 +21,11 @@ async fn main() {
 
     println!("1");
 
-    match Command::new("/usr/bin/raspistill -o /var/log/images/abcd.jpg").output() {
+    match Command::new("/usr/bin/raspistill")
+        .arg("-o")
+        .arg("/var/log/images/abcd.jpg")
+        .output()
+    {
         Ok(_r) => println!("Ok"),
         Err(e) => println!("error trying to capture image: {e}"),
     }
