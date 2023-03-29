@@ -8,6 +8,7 @@ const GPIO_PIR: u8 = 21;
 #[tokio::main]
 async fn main() {
     let pir = PIR::new("BedroomSensor", GPIO_PIR);
+    let directory_to_hold_images = "/var/log/images";
 
     loop {
         if let Ok(detection_msg) = pir.receive() {
@@ -19,17 +20,21 @@ async fn main() {
             println!("detection happened, sensor: {detection_name}, time: {datetime:?} ");
 
             let datetime = datetime.replace(" ", "").replace(":", "").replace("/", "");
-            let prefix = format!("/var/log/images/{datetime}");
+            let prefix = format!("{directory_to_hold_images}/{datetime}");
 
             fs::create_dir(prefix.clone()).expect("trying to create a directory");
 
             for i in 0..30 {
+                let file_name = format!("{prefix}/{detection_name}-{i}.jpg");
+
                 match Command::new("/usr/bin/raspistill")
+                    .arg("-rot")
+                    .arg("180")
                     .arg("-o")
-                    .arg(&format!("{prefix}/{detection_name}-{i}.jpg"))
+                    .arg(&file_name)
                     .output()
                 {
-                    Ok(_r) => println!("Ok"),
+                    Ok(_r) => continue,
                     Err(e) => println!("error trying to capture image: {e}"),
                 }
             }
