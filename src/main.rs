@@ -32,10 +32,11 @@ async fn main() {
             let datetime = datetime.replace(" ", "");
             let prefix = format!("~/{datetime}");
 
-            fs::create_dir(prefix).expect("trying to create a directory");
+            fs::create_dir(prefix.clone()).expect("trying to create a directory");
 
             for i in 0..30 {
-                camera_settings.output = &format!("{prefix}/{detection_name}-{i}.jpg");
+                let file_path_and_name = format!("{prefix}/{detection_name}-{i}.jpg");
+                camera_settings.set_output(file_path_and_name.as_str());
                 camera_operations::click_image(camera_settings.clone(), image_settings.clone());
             }
         }
