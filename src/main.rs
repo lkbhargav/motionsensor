@@ -40,7 +40,7 @@ async fn main() {
                     camera_settings.clone(),
                     image_settings.clone(),
                 ) {
-                    Ok(r) => continue,
+                    Ok(_r) => continue,
                     Err(e) => println!("error trying to capture image: {e}"),
                 }
             }
