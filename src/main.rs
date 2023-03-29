@@ -6,7 +6,6 @@ use raspicam::image::{
     settings::{CameraSettings, ImageSettings},
 };
 use std::fs;
-use std::{process::Command, thread, time::Duration};
 
 const GPIO_PIR: u8 = 21;
 
@@ -15,7 +14,7 @@ async fn main() {
     let pir = PIR::new("BedroomSensor", GPIO_PIR);
 
     // Initialize camera settings with their default values.
-    let camera_settings = CameraSettings::default();
+    let mut camera_settings = CameraSettings::default();
 
     // Initialize image settings with their default values.
     let image_settings = ImageSettings::default();
@@ -36,7 +35,7 @@ async fn main() {
 
             for i in 0..30 {
                 let file_path_and_name = format!("{prefix}/{detection_name}-{i}.jpg");
-                camera_settings.set_output(file_path_and_name.as_str());
+                camera_settings.set_output(&file_path_and_name);
                 camera_operations::click_image(camera_settings.clone(), image_settings.clone());
             }
         }
