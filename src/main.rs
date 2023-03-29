@@ -1,10 +1,7 @@
+use chrono::offset::Utc;
+use chrono::DateTime;
 use motionsensor::pir::PIR;
-use std::{
-    sync::mpsc::{self, sync_channel, Receiver, SyncSender},
-    thread,
-    time::{self, Duration, SystemTime},
-};
-use tokio::task;
+use std::{thread, time::Duration};
 
 const GPIO_PIR: u8 = 21;
 

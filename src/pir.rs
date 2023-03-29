@@ -1,11 +1,8 @@
 use anyhow::Result;
-use chrono::offset::Utc;
-use chrono::DateTime;
 use pir_motion_sensor::sensor::motion::MotionSensor;
 use std::{
     sync::mpsc::{self, sync_channel, Receiver, SyncSender},
-    thread,
-    time::{self, Duration, SystemTime},
+    time::SystemTime,
 };
 use tokio::task;
 
@@ -33,6 +30,8 @@ impl PIR {
             None,                      // None for real GPIO usage, Some(Vec<u128>) for unit tests
         );
 
+        let (_stop_command, receiver) = mpsc::channel();
+
         // starting detector in the background
         task::spawn_blocking(move || sensor_bedroom.start_detector(receiver));
 
@@ -42,6 +41,6 @@ impl PIR {
     }
 
     pub fn receive(&self) -> Result<(String, SystemTime)> {
-        Ok(&self.rcvr.try_recv())
+        Ok(self.rcvr.try_recv().clone()?)
     }
 }
