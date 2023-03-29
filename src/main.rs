@@ -60,11 +60,12 @@ async fn main() {
             }
 
             if vars.email_alert {
-                let mut message = format!(
+                let tmp = format!(
                     "Motion detected and {} images are being collected to {}",
                     vars.number_of_images_to_capture, prefix
-                )
-                .as_str();
+                );
+
+                let mut message = tmp.as_str();
 
                 if !vars.capture_image {
                     message = "Motion detected in the room!";
