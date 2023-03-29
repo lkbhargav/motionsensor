@@ -47,7 +47,7 @@ async fn main() {
             }
 
             if vars.email_alert {
-                gmail.send(
+                let res = gmail.send(
                     TO_ADDRESS,
                     "Motion detected",
                     format!(
@@ -55,7 +55,11 @@ async fn main() {
                         vars.number_of_images_to_capture, prefix
                     )
                     .as_str(),
-                )
+                );
+
+                if res.is_err() {
+                    println!("error sending email: {}", res.err().unwrap());
+                }
             }
 
             for i in 0..vars.number_of_images_to_capture {
